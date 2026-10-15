@@ -1,12 +1,12 @@
 # Production-Ready Playwright + Python + Pytest Automation Framework
 
-[![Playwright Tests](https://github.com/aishwaryaas/playwright-python-pytest-framework/actions/workflows/ci.yml/badge.svg)](https://github.com/aishwaryaas/playwright-python-pytest-framework/actions)
+[![Playwright Tests](https://github.com/aishwaryyaa12/playwright-python-pytest-framework/actions/workflows/ci.yml/badge.svg)](https://github.com/aishwaryyaa12/playwright-python-pytest-framework/actions)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/)
 [![Playwright](https://img.shields.io/badge/Playwright-v1.40+-green.svg)](https://playwright.dev/python/)
 
 An end-to-end Web & API Test Automation Framework engineered in **Python** using **Playwright**, **Pytest**, and **Page Object Model (POM)** architecture, integrated with **GitHub Actions CI/CD** and HTML reporting.
 
-Developed by **[Aishwarya Shanmugam](https://linkedin.com/in/aishwaryaas)** (QA Engineer).
+Developed by **[Aishwarya Shanmugam](https://linkedin.com/in/aishwaryyaa12)** (QA Engineer).
 
 ---
 
@@ -50,7 +50,7 @@ Developed by **[Aishwarya Shanmugam](https://linkedin.com/in/aishwaryaas)** (QA 
 ### 2. Installation
 ```bash
 # Clone repository
-git clone https://github.com/aishwaryaas/playwright-python-pytest-framework.git
+git clone https://github.com/aishwaryyaa12/playwright-python-pytest-framework.git
 cd playwright-python-pytest-framework
 
 # Create and activate virtual environment
@@ -121,4 +121,4 @@ jobs:
 ## 👩‍💻 Author
 **Aishwarya Shanmugam** — QA Engineer | Test Automation Specialist  
 📍 Steinenbronn (Stuttgart Region), Germany  
-🔗 [LinkedIn Profile](https://linkedin.com/in/aishwaryaas)
+🔗 [LinkedIn Profile](https://linkedin.com/in/aishwaryyaa12)
