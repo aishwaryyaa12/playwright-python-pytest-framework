@@ -15,20 +15,20 @@ def test_jamoona_homepage_loads(page):
 @pytest.mark.ui
 @pytest.mark.regression
 def test_jamoona_search_product(page):
-    """Verifies searching for 'Basmati' returns active grocery product listings."""
+    """Verifies searching for 'Sona Masoori' returns active grocery product listings."""
     home_page = JamoonaHomePage(page).load()
-    home_page.search_for("Basmati")
+    home_page.search_for("Sona Masoori")
     
     # Assert URL transitioned to search results
     current_url = page.url
-    assert "search?q=Basmati" in current_url, f"Expected search query in URL, got {current_url}"
+    assert "search?q=Sona Masoori" in current_url, f"Expected search query in URL, got {current_url}"
     
     # Verify product items returned on the search page
     search_page = JamoonaSearchPage(page)
     products = search_page.get_product_titles()
     
-    assert len(products) > 0, "Expected search results for 'Basmati' to be non-empty."
+    assert len(products) > 0, "Expected search results for 'Sona Masoori' to be non-empty."
     
     # Assert relevant search keywords appear in the top results
     top_matches = [p.lower() for p in products[:5]]
-    assert any("basmati" in p or "reis" in p for p in top_matches), f"Top results did not contain expected terms: {top_matches}"
+    assert any("Sona Masoori" in p or "reis" in p for p in top_matches), f"Top results did not contain expected terms: {top_matches}"
