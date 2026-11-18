@@ -1,124 +1,104 @@
-# Production-Ready Playwright + Python + Pytest Automation Framework
+# Playwright + Python + Pytest Automation Framework
 
-[![Playwright Tests](https://github.com/aishwaryyaa12/playwright-python-pytest-framework/actions/workflows/ci.yml/badge.svg)](https://github.com/aishwaryyaa12/playwright-python-pytest-framework/actions)
-[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/)
-[![Playwright](https://img.shields.io/badge/Playwright-v1.40+-green.svg)](https://playwright.dev/python/)
+[![CI](https://github.com/aishwaryyaa12/playwright-python-pytest-framework/actions/workflows/ci.yml/badge.svg)](https://github.com/aishwaryyaa12/playwright-python-pytest-framework/actions)
+[![Python](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Playwright](https://img.shields.io/badge/Playwright-1.40+-2EAD33?logo=playwright&logoColor=white)](https://playwright.dev/python/)
+[![Pytest](https://img.shields.io/badge/Pytest-7.4+-0A9EDC?logo=pytest&logoColor=white)](https://docs.pytest.org/)
 
-An end-to-end Web & API Test Automation Framework engineered in **Python** using **Playwright**, **Pytest**, and **Page Object Model (POM)** architecture, integrated with **GitHub Actions CI/CD** and HTML reporting.
+A modular UI and API test automation framework built with Python, Playwright, and Pytest following the Page Object Model (POM) pattern. Configured for parallel execution, headless/headed browser switching, and GitHub Actions CI/CD.
 
-Developed by **[Aishwarya Shanmugam](https://linkedin.com/in/aishwaryyaa12)** (QA Engineer).
-
----
-
-## 🌟 Framework Architecture & Highlights
-
-- **Page Object Model (POM)**: Decoupled UI page locators and user interactions from test assertions.
-- **Pytest Fixture Management**: Modular `conftest.py` supporting parallel test execution, headless/headed browser toggling, and multi-browser configurations (Chromium, Firefox, WebKit).
-- **API & UI Dual Capability**: Integrated REST API verification (`playwright.request`) alongside UI end-to-end regression suites.
-- **CI/CD Pipeline Integration**: Automated execution on GitHub Actions triggered on every Pull Request or push commit.
-- **Allure & HTML Reporting**: Automated test execution reports, failure screenshots, and trace viewer recordings.
+**Author:** [Aishwarya Shanmugam](https://linkedin.com/in/aishwaryyaa12) (QA Automation Engineer)
 
 ---
 
-## 🛠️ Project Structure
+## Why I Built This & Architectural Decisions
+
+Having spent several years building and maintaining Selenium suites in enterprise environments (including at Capgemini and Bettermile), I built this framework to address three recurring pain points in UI automation:
+
+1. **Flaky Tests & Hydration Delays (Playwright vs. Selenium):**  
+   In modern React/Vue applications, tests often fail because elements exist in the DOM before their JavaScript event listeners are hydrated. In Selenium, teams frequently fall back on `time.sleep()` or brittle `WebDriverWait` wrappers. I chose Playwright here because its built-in auto-waiting mechanism checks element visibility, stability, and actionable state before firing clicks, virtually eliminating timing-related flakiness.
+
+2. **Decoupled Page Object Architecture:**  
+   Locators and actions are strictly encapsulated in page classes (`pages/login_page.py`, `pages/inventory_page.py`). Test functions only express user intent (`login_page.login(user, pwd)`), never raw CSS/XPath selectors. If the DOM structure changes, only the Page Object requires updates.
+
+3. **Hybrid UI + API Testing in One Suite:**  
+   Instead of testing everything through slow browser interactions, the framework includes API tests (`tests/test_api_products.py`). This allows pre-seeding test state or verifying backend data contracts directly without spinning up a browser context.
+
+---
+
+## Repository Structure
 
 ```text
 ├── .github/workflows/
-│   └── ci.yml               # GitHub Actions CI pipeline configuration
+│   └── ci.yml               # GitHub Actions CI workflow (installs Playwright browsers & runs tests)
 ├── pages/
-│   ├── base_page.py         # Abstract Base Page with common Playwright interactions
-│   ├── login_page.py        # Login Page Object
-│   └── inventory_page.py    # Product Inventory Page Object
+│   ├── base_page.py         # Base class encapsulating Playwright actions & explicit assertions
+│   ├── login_page.py        # Login Page Object (locators & auth actions)
+│   └── inventory_page.py    # Inventory/Products Page Object (catalog & cart interactions)
 ├── tests/
-│   ├── test_ui_login.py     # UI E2E Test Suite
-│   └── test_api_products.py # REST API Test Suite
+│   ├── test_ui_login.py     # UI E2E tests (positive login, invalid password error, cart increment)
+│   └── test_api_products.py # REST API contract & latency tests against live endpoints
 ├── utils/
-│   └── config.py            # Environment & Test Data Configuration
-├── conftest.py              # Pytest fixtures for Playwright browser setup & tracing
-├── pytest.ini               # Pytest configuration settings
-└── requirements.txt         # Dependencies
+│   └── config.py            # Centralized environment URLs, credentials, and timeout configurations
+├── conftest.py              # Pytest fixtures managing session-scoped browser contexts & tabs
+├── pytest.ini               # Test run configuration, CLI flags, and custom markers
+└── requirements.txt         # Pinned project dependencies
 ```
 
 ---
 
-## 🚀 Getting Started
+## Edge Cases & Engineering Notes
+
+* **Viewport Stability:** Standardized browser context at `1280x720` in `conftest.py` to prevent responsive navigation menus from collapsing into hamburger icons, which often causes false-negative locator timeouts in headless Linux runners.
+* **API Latency SLA Check:** The API suite asserts that response times remain below 2.0 seconds (`response.elapsed.total_seconds() < 2.0`), catching server degradations during regression runs.
+* **Graceful Environment Handling:** `conftest.py` checks whether Playwright browser binaries are present before launching UI tests, cleanly skipping rather than crashing if run in lightweight development environments.
+
+---
+
+## Setup & Local Execution
 
 ### 1. Prerequisites
-- Python 3.10 or higher
-- Git
+* Python 3.10+
+* Git
 
 ### 2. Installation
 ```bash
-# Clone repository
+# Clone the repository
 git clone https://github.com/aishwaryyaa12/playwright-python-pytest-framework.git
 cd playwright-python-pytest-framework
 
 # Create and activate virtual environment
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv/bin/activate       # On Windows: venv\Scripts\activate
 
-# Install dependencies and Playwright browsers
+# Install dependencies and Playwright browser binaries
 pip install -r requirements.txt
-playwright install
+playwright install --with-deps
 ```
 
 ### 3. Running Tests
 ```bash
-# Run all tests headlessly
-pytest
+# Run full suite (UI + API) with verbose output
+pytest -v
 
-# Run tests in headed mode
+# Run only UI smoke tests
+pytest -m smoke
+
+# Run only REST API contract tests
+pytest -m api
+
+# Run headed mode (watch browser execution)
 pytest --headed
 
-# Run parallel tests (e.g. 4 workers)
-pytest -n 4
-
-# Generate HTML report
-pytest --html=report.html
+# Run tests in parallel across multiple workers
+pytest -n auto
 ```
 
 ---
 
-## 📊 CI/CD GitHub Actions Integration
+## Continuous Integration (GitHub Actions)
 
-The pipeline runs headless Chromium tests on Ubuntu runners for every push to `main` or `develop` branches:
-
-```yaml
-name: Playwright Test Automation CI
-
-on:
-  push:
-    branches: [ main, develop ]
-  pull_request:
-    branches: [ main, develop ]
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          playwright install --with-deps
-      - name: Run Playwright Tests
-        run: pytest --html=report.html --self-contained-html
-      - name: Upload Test Report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-report
-          path: report.html
-```
-
----
-
-## 👩‍💻 Author
-**Aishwarya Shanmugam** — QA Engineer | Test Automation Specialist  
-📍 Steinenbronn (Stuttgart Region), Germany  
-🔗 [LinkedIn Profile](https://linkedin.com/in/aishwaryyaa12)
+The pipeline (`.github/workflows/ci.yml`) runs automatically on every `push` and `pull_request` to `main`:
+1. Checks out repository and installs Python 3.11.
+2. Caches `pip` dependencies and installs Playwright Chromium/Firefox/WebKit binaries.
+3. Executes the full test suite and uploads execution logs and HTML reports as build artifacts.
